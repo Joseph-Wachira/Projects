@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: registry-backend
+    runtime: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run_prod.py
+    rootDir: backend
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.10.6
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: registry-db
+          property: connectionString
+
+  - type: static
+    name: registry-frontend
+    runtime: static
+    region: frankfurt
+    plan: free
+    buildCommand: npm install && npm run build
+    publishPath: build
+    rootDir: frontend
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: registry-backend
+          type: web
+          property: url
+
+databases:
+  - name: registry-db
+    plan: free
