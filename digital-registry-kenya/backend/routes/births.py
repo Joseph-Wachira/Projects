@@ -9,6 +9,7 @@ births_bp = Blueprint('births', __name__)
 @jwt_required()
 def create_birth():
     data = request.get_json()
+    
     birth = Birth(
         registration_number=data['registration_number'],
         child_name=data['child_name'],
